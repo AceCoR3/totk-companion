@@ -337,3 +337,33 @@ dialog{width:min(480px,92vw);max-height:88dvh;overflow:auto;border:1px solid var
     display:inline !important;
   }
 }
+
+/* v1.0.8.5 — completed markers stay visible and fade instead of disappearing */
+.marker.completed{
+  opacity:.30 !important;
+  filter:saturate(.35) brightness(.82) !important;
+}
+.marker.completed:hover,
+.marker.completed.selected{
+  opacity:.72 !important;
+}
+.marker-cluster{transition:opacity .15s ease}
+
+/* Cleaner marker detail card; no regional-progress changes. */
+.detail-card-clean{overflow:hidden}
+.detail-card-head{display:grid;grid-template-columns:48px minmax(0,1fr) 32px;gap:11px;align-items:center}
+.detail-big-icon{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:rgba(21,58,48,.72);border:1px solid rgba(104,194,165,.24);font-size:22px}
+.detail-title-wrap{min-width:0}.detail-title-wrap h3{margin:3px 0 0;line-height:1.18}
+.detail-kind{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:#83cdb6}
+.detail-close-icon{width:32px;height:32px;border:0;border-radius:9px;background:rgba(255,255,255,.06);color:#bdd6ce;font-size:20px;cursor:pointer}
+.detail-status{display:inline-flex;margin-top:12px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(255,255,255,.06);color:#b8cec7}
+.detail-status.is-done{background:rgba(76,190,151,.13);color:#8ce0c4}
+.detail-coords{margin-top:10px}
+.detail-note-clean{margin-top:11px;padding:11px;border-radius:10px;background:rgba(12,38,31,.72);border:1px solid rgba(94,166,143,.16)}
+.detail-note-clean span{font-size:9px;letter-spacing:.12em;color:#72b8a3}.detail-note-clean p{margin:5px 0 0;line-height:1.4}
+.detail-actions-clean{display:grid;grid-template-columns:1fr 1.25fr;gap:8px;margin-top:12px}
+@media(max-width:720px){
+ .detail-card-head{grid-template-columns:44px minmax(0,1fr) 30px;gap:9px}
+ .detail-big-icon{width:44px;height:44px}
+ .detail-actions-clean{grid-template-columns:1fr 1.15fr}
+}

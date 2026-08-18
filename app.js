@@ -263,7 +263,7 @@ function renderFilters(){
   const visibleTypes=[...filters.querySelectorAll('input')];
   $('toggleAllFilters').textContent=visibleTypes.length&&visibleTypes.every(i=>i.checked)?'Alle aus':'Alle an';
 }
-function visible(){const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();return allMarkers().filter(m=>m.layer===currentLayer&&active.has(m.type)&&(!hideCompleted.checked||!completed.has(m.id))&&(!q||`${markerName(m)} ${m.name} ${m.name_en||''} ${m.type} ${m.note||''}`.toLowerCase().includes(q)))}
+function visible(){const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();return allMarkers().filter(m=>m.layer===currentLayer&&active.has(m.type)&&(!q||`${markerName(m)} ${m.name} ${m.name_en||''} ${m.type} ${m.note||''}`.toLowerCase().includes(q)))}
 
 let placeLabelRAF=0;
 function schedulePlaceLabels(){
@@ -375,11 +375,24 @@ function renderDetail(){
   const m=allMarkers().find(x=>x.id===selectedId);
   if(!m||m.layer!==currentLayer){detailPanel.innerHTML='<div class="detail-empty"><div class="detail-icon">⌖</div><h3>Marker auswählen</h3><p>Tippe auf einen Marker für Details.</p></div>';return}
   const info=typeInfo[m.type]||typeInfo.custom;
-  detailPanel.innerHTML=`<div class="detail-card"><div class="detail-card-top"><span class="type-pill"><span style="color:${info.color}">${info.icon}</span>${info.label}</span></div><h3>${esc(markerName(m))}</h3><div class="coords">X ${Math.round(m.x)} · Y ${Math.round(m.y)} · Z ${Math.round(m.z)}</div><p class="detail-note">${esc(m.note||'Keine Zusatznotiz.')}</p><div class="detail-actions"><button class="ghost" id="focusMarkerBtn">◎ Fokussieren</button><button class="ghost" id="detailCloseBtn">× Schließen</button><button class="primary" id="completeBtn">${completed.has(m.id)?'↺ Als offen markieren':'✓ Erledigt'}</button>${m.custom?'<button class="ghost danger delete-btn" id="deleteBtn">Marker löschen</button>':''}</div></div>`;
+  const done=completed.has(m.id);
+  detailPanel.innerHTML=`<div class="detail-card detail-card-clean">
+    <div class="detail-card-head">
+      <div class="detail-big-icon"><span style="color:${info.color}">${info.icon}</span></div>
+      <div class="detail-title-wrap"><span class="detail-kind">${esc(info.label)}</span><h3>${esc(markerName(m))}</h3></div>
+      <button class="detail-close-icon" id="detailCloseBtn" aria-label="Schließen">×</button>
+    </div>
+    <div class="detail-status ${done?'is-done':''}">${done?'✓ Erledigt':'○ Noch offen'}</div>
+    <div class="coords detail-coords">X ${Math.round(m.x)} · Y ${Math.round(m.y)} · Z ${Math.round(m.z)}</div>
+    ${m.note?`<div class="detail-note-clean"><span>HINWEIS</span><p>${esc(m.note)}</p></div>`:''}
+    <div class="detail-actions detail-actions-clean">
+      <button class="ghost" id="focusMarkerBtn">◎ Fokussieren</button>
+      <button class="primary" id="completeBtn">${done?'↺ Wieder öffnen':'✓ Erledigt'}</button>
+    </div>
+  </div>`;
   $('focusMarkerBtn').onclick=()=>panToCoordinate(m.x,m.y,Math.max(3,view.zoom));
   $('detailCloseBtn').onclick=()=>{selectedId=null;render()};
   $('completeBtn').onclick=()=>{completed.has(m.id)?completed.delete(m.id):completed.add(m.id);localStorage.setItem('totk.completed',JSON.stringify([...completed]));render()};
-  if(m.custom)$('deleteBtn').onclick=()=>{customMarkers=customMarkers.filter(x=>x.id!==m.id);localStorage.setItem('totk.customMarkers',JSON.stringify(customMarkers));selectedId=null;renderFilters();render()};
 }
 function renderProgress(){
   const w=$('progressList');w.innerHTML='';

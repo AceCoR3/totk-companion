@@ -351,7 +351,7 @@ body{
 </style>
 
 </head>
-<body>
+<body><input type="checkbox" id="hideCompleted" style="display:none" aria-hidden="true">
 <div id="startupBoot" aria-label="TOTK Companion wird geladen">
  <div class="boot-grid"></div><div class="boot-scan"></div>
  <div class="boot-core">
@@ -398,11 +398,7 @@ body{
             <button id="toggleAllFilters" class="text-button">Alle aus</button>
           </div>
           <div class="feature-toggle-group">
-            <label class="toggle-row feature-toggle">
-              <input id="hideCompleted" type="checkbox" />
-              <span class="toggle-ui"></span>
-              <span>Erledigte ausblenden</span>
-            </label>
+            
             <label class="toggle-row feature-toggle">
               <input id="showPlaceLabels" type="checkbox" checked />
               <span class="toggle-ui"></span>

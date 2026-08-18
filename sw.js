@@ -1,4 +1,4 @@
-const CACHE_NAME = 'totk-companion-v1084-mobile-icons-fix';
+const CACHE_NAME = 'totk-companion-v1086-no-fade-toggle';
 const APP_FILES = [
   "./LOKALISIERUNG.md",
   "./README.md",
