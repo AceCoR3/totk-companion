@@ -57,3 +57,29 @@ dialog{width:min(480px,92vw);max-height:88dvh;overflow:auto;border:1px solid var
 
 /* Native marker clustering */
 .marker-cluster{--cluster-color:#71e0bd;position:absolute;z-index:6;min-width:34px;height:34px;padding:0 9px;display:flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid color-mix(in srgb,var(--cluster-color) 75%,white 20%);background:color-mix(in srgb,var(--cluster-color) 18%,rgba(5,13,11,.96));color:#effff9;font-size:12px;font-weight:950;line-height:1;box-shadow:0 5px 14px rgba(0,0,0,.48),0 0 0 2px rgba(0,0,0,.35),0 0 17px color-mix(in srgb,var(--cluster-color) 24%,transparent);transform:translate(-50%,-50%) scale(var(--invZoom));transform-origin:center;cursor:pointer;user-select:none;transition:filter .14s,transform .14s}.marker-cluster:hover{z-index:9;filter:brightness(1.18);transform:translate(-50%,-50%) scale(calc(var(--invZoom)*1.12));border-color:#fff}.marker-cluster small{font-size:8px;margin-left:3px;opacity:.72}.marker-cluster.mixed{--cluster-color:#9ab9ae}@media(max-width:720px){.marker-cluster{min-width:38px;height:38px;font-size:13px}}
+
+/* ROMFS category icons in the existing sidebar filter circles */
+.filter-icon img{
+  display:block;
+  width:20px;
+  height:20px;
+  object-fit:contain;
+  margin:auto;
+  pointer-events:none;
+}
+@media(max-width:720px){
+  .filter-icon img{
+    width:21px;
+    height:21px;
+  }
+}
+
+/* Kartografierturm: no dedicated ROMFS icon exists; use the same gold tower glyph as on the map. */
+.filter-chip input[data-type="tower"] + .filter-icon{
+  color:#f2d56b;
+  text-indent:0;
+  font-size:18px;
+  line-height:1;
+  display:grid;
+  place-items:center;
+}

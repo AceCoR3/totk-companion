@@ -241,6 +241,7 @@ function layerTypeCounts(layer=currentLayer){
   allMarkers().forEach(m=>{if(m.layer===layer)counts.set(m.type,(counts.get(m.type)||0)+1)});
   return counts;
 }
+const listIconMap={"shrine":"shrine.png","lightroot":"lightroot.png","korok":"korok_hidden_start.png","cave":"cave.png","bubbul":"bubbul.png","well":"well.png","chasm":"chasm.png","hinox":"hinox.png","talus":"talus.png","molduga":"molduga.png","flux_construct":"flux_construct.png","frox":"frox.png","gleeok":"gleeok.png","old_map":"old_map.png","sages_will":"sages_will.png","addison":"addison_sign.png","yiga_schematic":"yiga_schematic.png","schema_stone":"schema_stone.png","location":"location.png"};
 function renderFilters(){
   filters.innerHTML='';
   const active=enabledTypes();
@@ -251,7 +252,7 @@ function renderFilters(){
     const l=document.createElement('label');
     l.className=`filter-chip ${active.has(k)?'':'off'}`;
     l.style.setProperty('--marker-color',v.color||'#8ab8aa');
-    l.innerHTML=`<input type="checkbox" ${active.has(k)?'checked':''} data-type="${k}"><span class="filter-icon">${v.icon}</span><span class="filter-copy"><b>${v.label}</b></span><small class="filter-count">${count.toLocaleString('de-DE')}</small>`;
+    l.innerHTML=`<input type="checkbox" ${active.has(k)?'checked':''} data-type="${k}"><span class="filter-icon">${listIconMap[k]?`<img src="assets/icons/${listIconMap[k]}" alt="">`:v.icon}</span><span class="filter-copy"><b>${v.label}</b></span><small class="filter-count">${count.toLocaleString('de-DE')}</small>`;
     filters.appendChild(l);
   });
   filters.querySelectorAll('input').forEach(i=>i.onchange=e=>{
