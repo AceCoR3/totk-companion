@@ -581,3 +581,33 @@ dialog{width:min(480px,92vw);max-height:88dvh;overflow:auto;border:1px solid var
 #mapViewport{
   touch-action:none;
 }
+
+/* v1.0.9.1 — completed state: unmistakable but still visible */
+.marker.completed{
+  opacity:.38 !important;
+  filter:grayscale(.72) saturate(.28) brightness(.78) !important;
+}
+.marker.completed::after{
+  content:"✓";
+  position:absolute;
+  right:-4px;
+  bottom:-4px;
+  width:15px;
+  height:15px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#173f34;
+  border:1px solid #8ee0c5;
+  color:#dffff5;
+  font-size:10px;
+  font-weight:900;
+  line-height:1;
+  box-shadow:0 1px 4px rgba(0,0,0,.55);
+  pointer-events:none;
+}
+.marker.completed:hover,
+.marker.completed.selected{
+  opacity:.76 !important;
+  filter:grayscale(.25) saturate(.65) brightness(.92) !important;
+}

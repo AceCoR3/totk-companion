@@ -319,7 +319,15 @@ function renderFilters(){
 let _allMarkersCache=null;
 function fastAllMarkers(){return _allMarkersCache||(_allMarkersCache=allMarkers())}
 function invalidateMarkerCache(){_allMarkersCache=null}
-function visible(){const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();return fastAllMarkers().filter(m=>m.layer===currentLayer&&active.has(m.type)&&(!q||`${markerName(m)} ${m.name} ${m.name_en||''} ${m.type} ${m.note||''}`.toLowerCase().includes(q)))}
+function visible(){
+  const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();
+  return fastAllMarkers().filter(m=>{
+    if(m.layer!==currentLayer)return false;
+    const hay=`${markerName(m)} ${m.name||''} ${m.name_en||''} ${m.type||''} ${(typeInfo[m.type]&&typeInfo[m.type].label)||''} ${m.note||''}`.toLowerCase();
+    if(q)return hay.includes(q); // search overrides category visibility
+    return active.has(m.type);
+  });
+}
 
 let placeLabelRAF=0;
 function schedulePlaceLabels(){
@@ -522,7 +530,23 @@ $('toggleAllFilters').onclick=()=>{const rendered=[...filters.querySelectorAll('
 const setSidebar=open=>document.body.classList.toggle('sidebar-open',open);
 $('openSidebarBtn').onclick=()=>setSidebar(true);$('closeSidebarBtn').onclick=()=>setSidebar(false);$('sidebarBackdrop').onclick=()=>setSidebar(false);
 let searchRenderTimer=0;
-searchInput.oninput=()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(render,90)};hideCompleted.onchange=render;showPlaceLabels.onchange=()=>{localStorage.setItem(PLACE_LABEL_KEY,JSON.stringify(showPlaceLabels.checked));renderPlaceLabels()};
+function runSmartSearch(){
+  const q=searchInput.value.trim().toLowerCase();
+  if(q){
+    const matches=fastAllMarkers().filter(m=>{
+      const hay=`${markerName(m)} ${m.name||''} ${m.name_en||''} ${m.type||''} ${(typeInfo[m.type]&&typeInfo[m.type].label)||''} ${m.note||''}`.toLowerCase();
+      return hay.includes(q);
+    });
+    if(matches.length && !matches.some(m=>m.layer===currentLayer)){
+      currentLayer=matches[0].layer;
+      localStorage.setItem('totk.layer',currentLayer);
+      updateLayerImage();
+      updateLayerFilterAvailability();
+    }
+  }
+  render();
+}
+searchInput.oninput=()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(runSmartSearch,90)};hideCompleted.onchange=render;showPlaceLabels.onchange=()=>{localStorage.setItem(PLACE_LABEL_KEY,JSON.stringify(showPlaceLabels.checked));renderPlaceLabels()};
 $('resetProgress').onclick=()=>{if(confirm('Fortschritt zurücksetzen?')){completed.clear();localStorage.removeItem('totk.completed');markStatsDirty();render()}};
 $('dataImport').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());importedMarkers=flatten(data).map(normalizeOne).filter(m=>Number.isFinite(m.x)&&Number.isFinite(m.y)&&Number.isFinite(m.z));localStorage.setItem('totk.importedMarkers',JSON.stringify(importedMarkers));invalidateMarkerCache();markStatsDirty();selectedId=null;renderFilters();render();alert(`${importedMarkers.length} Marker importiert.`)}catch(err){alert('JSON konnte nicht importiert werden: '+err.message)}};
 $('clearImported').onclick=()=>{importedMarkers=[];localStorage.removeItem('totk.importedMarkers');invalidateMarkerCache();markStatsDirty();renderFilters();render()};
