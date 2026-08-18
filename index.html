@@ -92,6 +92,160 @@
 @media(max-width:720px){.layer-romfs-icon{width:23px;height:23px;flex-basis:23px}}
 </style>
 
+
+<style id="ios-safe-area-fix">
+:root{
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+/* Use the real mobile viewport instead of the legacy 100vh. */
+html, body{
+  width:100%;
+  min-height:100%;
+  overscroll-behavior:none;
+}
+body{
+  min-height:100dvh !important;
+  height:100dvh !important;
+  overflow:hidden !important;
+}
+.app-shell{
+  min-height:100dvh !important;
+  height:100dvh !important;
+  max-height:100dvh !important;
+  padding-top:var(--safe-top);
+  padding-right:var(--safe-right);
+  padding-bottom:var(--safe-bottom);
+  padding-left:var(--safe-left);
+  box-sizing:border-box;
+}
+.main{
+  min-height:0 !important;
+  height:100% !important;
+}
+.topbar{
+  padding-left:max(16px, calc(12px + var(--safe-left))) !important;
+  padding-right:max(16px, calc(12px + var(--safe-right))) !important;
+}
+.map-panel{
+  min-height:0 !important;
+  height:calc(100% - 82px) !important;
+}
+.map{
+  min-height:0 !important;
+  height:100% !important;
+}
+
+/* Keep floating controls away from iPhone edges / home indicator. */
+.zoom-controls,
+.map-controls,
+.floating-controls,
+.mobile-actions,
+.topbar-actions{
+  margin-right:max(10px, var(--safe-right)) !important;
+}
+.detail-panel,
+.bottom-sheet{
+  padding-bottom:max(18px, calc(12px + var(--safe-bottom))) !important;
+}
+.sidebar{
+  padding-left:max(18px, calc(12px + var(--safe-left))) !important;
+  padding-right:max(18px, calc(12px + var(--safe-right))) !important;
+  padding-bottom:max(18px, calc(12px + var(--safe-bottom))) !important;
+}
+
+/* iPhone / small-screen layout */
+@media (max-width: 720px){
+  .app-shell{
+    display:block !important;
+    width:100vw !important;
+    height:100dvh !important;
+  }
+
+  .main{
+    width:100% !important;
+    height:100% !important;
+  }
+
+  .topbar{
+    height:64px !important;
+    min-height:64px !important;
+    padding-top:8px !important;
+    padding-bottom:8px !important;
+  }
+
+  .topbar h2{
+    font-size:17px !important;
+  }
+
+  .map-panel{
+    height:calc(100% - 64px) !important;
+    min-height:0 !important;
+  }
+
+  .map{
+    height:100% !important;
+    min-height:0 !important;
+  }
+
+  .topbar-actions{
+    gap:6px !important;
+  }
+
+  .topbar-actions .ghost,
+  .topbar-actions button{
+    padding:8px 9px !important;
+    min-width:40px;
+    min-height:40px;
+  }
+
+  /* Generic floating buttons */
+  .map button,
+  .map-panel > button,
+  .floating-controls button,
+  .zoom-controls button{
+    touch-action:manipulation;
+  }
+
+  .zoom-controls,
+  .floating-controls,
+  .map-controls{
+    right:max(12px, calc(8px + var(--safe-right))) !important;
+    bottom:max(16px, calc(10px + var(--safe-bottom))) !important;
+  }
+
+  /* Mobile drawer respects notch/home indicator */
+  .sidebar{
+    padding-top:max(18px, calc(12px + var(--safe-top))) !important;
+    padding-bottom:max(22px, calc(14px + var(--safe-bottom))) !important;
+    max-height:100dvh !important;
+  }
+
+  dialog{
+    max-width:calc(100vw - 24px - var(--safe-left) - var(--safe-right)) !important;
+    max-height:calc(100dvh - 24px - var(--safe-top) - var(--safe-bottom)) !important;
+  }
+}
+
+/* Landscape iPhones need side safe areas as well. */
+@media (orientation: landscape) and (max-height: 520px){
+  .app-shell{
+    padding-left:max(var(--safe-left), 8px);
+    padding-right:max(var(--safe-right), 8px);
+  }
+  .topbar{
+    height:56px !important;
+    min-height:56px !important;
+  }
+  .map-panel{
+    height:calc(100% - 56px) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="startupBoot" aria-label="TOTK Companion wird geladen">
