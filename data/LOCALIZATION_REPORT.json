@@ -1,0 +1,219 @@
+{
+  "embedded_german_overrides": 1499,
+  "by_type": {
+    "shrine": 152,
+    "lightroot": 120,
+    "korok": 900,
+    "talus": 87,
+    "molduga": 4,
+    "flux_construct": 35,
+    "frox": 40,
+    "gleeok": 14,
+    "old_map": 31,
+    "sages_will": 20,
+    "addison": 81,
+    "tower": 15
+  },
+  "examples": [
+    {
+      "en": "Tajikats Shrine",
+      "de": "Tadjiqats-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Jochi-iu Shrine",
+      "de": "Joti-i’u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Sitsum Shrine",
+      "de": "Situmo’i-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Oromuwak Shrine",
+      "de": "Orom-waka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Mayachin Shrine",
+      "de": "Maya-tsino’u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Musanokir Shrine",
+      "de": "Muzanqira-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Ren-iz Shrine",
+      "de": "Ren-ise-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Sahirow Shrine",
+      "de": "Zahirowa-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Rotsumamu Shrine",
+      "de": "Romtsuma-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Mayamats Shrine",
+      "de": "Maya-matuno-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Serutabomac Shrine",
+      "de": "Zertab-mats-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Mogawak Shrine",
+      "de": "Moga-waka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Zanmik Shrine",
+      "de": "Sanmikka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Jiukoum Shrine",
+      "de": "Jiuk-um-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Iun-orok Shrine",
+      "de": "I’un-oroq-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Rakashog Shrine",
+      "de": "Raqasho-go-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Soryotanog Shrine",
+      "de": "Sorjotanig-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Mayak Shrine",
+      "de": "Maya-koq-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Gemimik Shrine",
+      "de": "Gemimiq-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Orochium Shrine",
+      "de": "Orotsi-um-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Sinakawak Shrine",
+      "de": "Sinaqa-waka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Tauyosipun Shrine",
+      "de": "Ta’ujosi-puni-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Tukarok Shrine",
+      "de": "Tsuqarok-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Sikukuu Shrine",
+      "de": "Sikkudji-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Siwakama Shrine",
+      "de": "Siwakama-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Turakawak Shrine",
+      "de": "Turaq-waka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Riogok Shrine",
+      "de": "Riogok-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Anedamimik Shrine",
+      "de": "Andamimka-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Mayausiy Shrine",
+      "de": "Maya-usi’u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Ishodag Shrine",
+      "de": "Ishodgun-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Kiuyoyou Shrine",
+      "de": "Kiujoj-u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Ekochiu Shrine",
+      "de": "Ekotsi’u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Tadarok Shrine",
+      "de": "Tadarok-un-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Karahatag Shrine",
+      "de": "Kara-hatagi-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Tenbez Shrine",
+      "de": "Temb’sai-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Kisinona Shrine",
+      "de": "Kisinona-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Oshozan-u Shrine",
+      "de": "Oshosan-u-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Gasas Shrine",
+      "de": "Gazaz-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Ijo-o Shrine",
+      "de": "Idjo-o-Schrein",
+      "type": "shrine"
+    },
+    {
+      "en": "Turakamik Shrine",
+      "de": "Turaqamika-Schrein",
+      "type": "shrine"
+    }
+  ]
+}

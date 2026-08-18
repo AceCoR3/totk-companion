@@ -1,0 +1,21 @@
+{
+  "shrine": "shrine.png",
+  "lightroot": "lightroot.png",
+  "korok": "korok_hidden_start.png",
+  "cave": "cave.png",
+  "bubbulfrog": "bubbul.png",
+  "well": "well.png",
+  "chasm": "chasm.png",
+  "hinox": "hinox.png",
+  "talus": "talus.png",
+  "molduga": "molduga.png",
+  "flux": "flux_construct.png",
+  "frox": "frox.png",
+  "gleeok": "gleeok.png",
+  "oldmap": "old_map.png",
+  "sagewill": "sages_will.png",
+  "addison": "addison_sign.png",
+  "schematic": "yiga_schematic.png",
+  "schema": "schema_stone.png",
+  "location": "location.png"
+}

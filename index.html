@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#08110f" />
+  <title>TOTK Companion v1.0 DE</title>
+  <link rel="stylesheet" href="styles.css" />
+<style id="romfs-icons">
+.marker{background-repeat:no-repeat!important;background-position:center!important;background-size:76% 76%!important;color:transparent!important;}
+.marker.shrine{background-image:url('assets/icons/shrine.png')!important;}
+.marker.lightroot{background-image:url('assets/icons/lightroot.png')!important;}
+.marker.korok{background-image:url('assets/icons/korok_hidden_start.png')!important;}
+.marker.cave{background-image:url('assets/icons/cave.png')!important;}
+.marker.bubbul{background-image:url('assets/icons/bubbul.png')!important;}
+.marker.well{background-image:url('assets/icons/well.png')!important;}
+.marker.chasm{background-image:url('assets/icons/chasm.png')!important;}
+.marker.hinox{background-image:url('assets/icons/hinox.png')!important;}
+.marker.talus{background-image:url('assets/icons/talus.png')!important;}
+.marker.molduga{background-image:url('assets/icons/molduga.png')!important;}
+.marker.flux_construct{background-image:url('assets/icons/flux_construct.png')!important;}
+.marker.frox{background-image:url('assets/icons/frox.png')!important;}
+.marker.gleeok{background-image:url('assets/icons/gleeok.png')!important;}
+.marker.old_map{background-image:url('assets/icons/old_map.png')!important;}
+.marker.sages_will{background-image:url('assets/icons/sages_will.png')!important;}
+.marker.addison{background-image:url('assets/icons/addison_sign.png')!important;}
+.marker.yiga_schematic{background-image:url('assets/icons/yiga_schematic.png')!important;}
+.marker.schema_stone{background-image:url('assets/icons/schema_stone.png')!important;}
+.marker.location{background-image:url('assets/icons/location.png')!important;}
+.marker.completed::after{color:white!important}.marker.selected{filter:drop-shadow(0 0 8px rgba(255,255,255,.9));}
+</style>
+
+<style id="startup-animation-style">
+#startupBoot{
+ position:fixed;inset:0;z-index:99999;display:grid;place-items:center;
+ background:radial-gradient(circle at 50% 45%,#17332d 0,#0b1816 34%,#050a09 72%);
+ overflow:hidden;transition:opacity .65s ease,visibility .65s ease;
+}
+#startupBoot.boot-hide{opacity:0;visibility:hidden;pointer-events:none}
+.boot-grid{position:absolute;inset:-20%;opacity:.18;background-image:
+ linear-gradient(rgba(104,232,194,.18) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(104,232,194,.18) 1px,transparent 1px);
+ background-size:42px 42px;transform:perspective(500px) rotateX(58deg) translateY(22%);
+ animation:bootGrid 2.8s ease-out both}
+.boot-scan{position:absolute;left:0;right:0;height:2px;top:-5%;
+ background:linear-gradient(90deg,transparent,#a9ffe4,transparent);
+ box-shadow:0 0 18px #68e8c2;animation:bootScan 2.2s ease-in-out .25s both}
+.boot-core{position:relative;width:min(270px,65vw);aspect-ratio:1;display:grid;place-items:center}
+.boot-ring,.boot-ring2{position:absolute;border:1px solid rgba(113,224,189,.55);border-radius:50%;
+ box-shadow:0 0 28px rgba(113,224,189,.12),inset 0 0 28px rgba(113,224,189,.08)}
+.boot-ring{inset:7%;border-style:dashed;animation:spinBoot 5s linear infinite,ringIn .8s ease-out both}
+.boot-ring2{inset:21%;border-color:rgba(183,255,217,.35);animation:spinBoot 3.5s linear infinite reverse,ringIn .9s .1s ease-out both}
+.boot-icon{width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(113,224,189,.75));
+ animation:iconBoot 1.3s cubic-bezier(.2,.8,.2,1) both}
+.boot-copy{position:absolute;top:calc(50% + 150px);text-align:center;width:min(90vw,520px)}
+.boot-title{font-weight:800;letter-spacing:.22em;font-size:clamp(15px,3vw,22px);color:#e9fff7;
+ text-transform:uppercase;text-shadow:0 0 18px rgba(113,224,189,.35)}
+.boot-status{margin-top:10px;color:#7faca0;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.boot-progress{width:min(280px,70vw);height:3px;background:#13221e;margin:14px auto 0;overflow:hidden;border-radius:10px}
+.boot-progress::after{content:"";display:block;height:100%;width:100%;background:#71e0bd;
+ transform-origin:left;animation:bootProgress 2.15s cubic-bezier(.25,.8,.2,1) both;box-shadow:0 0 12px #71e0bd}
+@keyframes spinBoot{to{transform:rotate(360deg)}}
+@keyframes ringIn{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+@keyframes iconBoot{0%{opacity:0;transform:scale(.5);filter:blur(8px)}55%{opacity:1;transform:scale(1.12)}100%{transform:scale(1);filter:drop-shadow(0 0 18px rgba(113,224,189,.75))}}
+@keyframes bootScan{0%{top:-5%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:105%;opacity:0}}
+@keyframes bootGrid{from{opacity:0;transform:perspective(500px) rotateX(58deg) translateY(38%)}to{opacity:.18;transform:perspective(500px) rotateX(58deg) translateY(22%)}}
+@keyframes bootProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){
+ #startupBoot{transition:none}.boot-grid,.boot-scan,.boot-ring,.boot-ring2,.boot-icon,.boot-progress::after{animation:none!important}
+}
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/pwa/apple-touch-icon.png">
+<meta name="theme-color" content="#102a24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TOTK Companion">
+<meta name="mobile-web-app-capable" content="yes">
+
+
+<style id="romfs-layer-icons-v2">
+.layer-tabs .tab{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:7px!important;
+}
+.layer-tabs .tab::before,.layer-tabs .tab::after{content:none!important;display:none!important;background-image:none!important;}
+.layer-romfs-icon{
+ width:21px;height:21px;object-fit:contain;display:block;flex:0 0 21px;
+}
+.layer-tabs .tab span{display:block;min-width:0;}
+@media(max-width:720px){.layer-romfs-icon{width:23px;height:23px;flex-basis:23px}}
+</style>
+
+</head>
+<body>
+<div id="startupBoot" aria-label="TOTK Companion wird geladen">
+ <div class="boot-grid"></div><div class="boot-scan"></div>
+ <div class="boot-core">
+  <div class="boot-ring"></div><div class="boot-ring2"></div>
+  <img class="boot-icon" src="assets/icons/surface.png" alt="">
+ </div>
+ <div class="boot-copy">
+  <div class="boot-title">TOTK Companion</div>
+  <div class="boot-status" id="bootStatus">Purah-Pad wird synchronisiert</div>
+  <div class="boot-progress"></div>
+ </div>
+</div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand">
+          <div class="brand-mark">◈</div>
+          <div class="brand-copy">
+            <h1>TOTK Companion</h1>
+            <p>Hyrule-Begleiter · v1.0 DE</p>
+          </div>
+        </div>
+        <button id="closeSidebarBtn" class="icon-button mobile-only" aria-label="Menü schließen">×</button>
+      </div>
+
+      <div class="layer-tabs" id="layerTabs">
+        <button class="tab active" data-layer="surface"><img class="layer-romfs-icon" src="assets/icons/surface.png" alt=""><span>Oberfläche</span></button>
+        <button class="tab" data-layer="sky"><img class="layer-romfs-icon" src="assets/icons/sky.png" alt=""><span>Himmel</span></button>
+        <button class="tab" data-layer="depths"><img class="layer-romfs-icon" src="assets/icons/depths.png" alt=""><span>Unterwelt</span></button>
+      </div>
+
+      <label class="search-box">
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" placeholder="Marker suchen…" autocomplete="off" />
+      </label>
+
+      <nav class="sidebar-nav" aria-label="Werkzeuge">
+        <button class="sidebar-nav-btn active" data-panel="markersPanel"><span>⌖</span>Marker</button>
+        <button class="sidebar-nav-btn" data-panel="progressPanel"><span>✓</span>Fortschritt</button>
+        <button class="sidebar-nav-btn" data-panel="toolsPanel"><span>⚙</span>Werkzeuge</button>
+      </nav>
+
+      <div class="sidebar-content">
+        <section id="markersPanel" class="side-panel active">
+          <div class="panel-heading">
+            <div><span class="eyebrow">KARTENFILTER</span><h2>Was willst du sehen?</h2></div>
+            <button id="toggleAllFilters" class="text-button">Alle aus</button>
+          </div>
+          <div class="feature-toggle-group">
+            <label class="toggle-row feature-toggle">
+              <input id="hideCompleted" type="checkbox" />
+              <span class="toggle-ui"></span>
+              <span>Erledigte ausblenden</span>
+            </label>
+            <label class="toggle-row feature-toggle">
+              <input id="showPlaceLabels" type="checkbox" checked />
+              <span class="toggle-ui"></span>
+              <span>Ortsnamen auf der Karte</span>
+            </label>
+          </div>
+          <div id="filters" class="filter-grid"></div>
+        </section>
+
+        <section id="progressPanel" class="side-panel">
+          <div class="panel-heading">
+            <div><span class="eyebrow">CHECKLISTE</span><h2>Dein Fortschritt</h2></div>
+            <button id="resetProgress" class="text-button danger">Zurücksetzen</button>
+          </div>
+          <div id="progressSummary" class="progress-summary"></div>
+          <div id="progressList" class="progress-list"></div>
+        </section>
+
+        <section id="toolsPanel" class="side-panel">
+          <div class="panel-heading"><div><span class="eyebrow">WERKZEUGE</span><h2>Werkzeuge</h2></div></div>
+          <div class="tool-card">
+            <div class="tool-title"><span>◎</span><div><b>Koordinaten-Finder</b><small>Position setzen & nächste Ziele finden</small></div></div>
+            <div class="coord-grid compact">
+              <input id="coordX" type="number" placeholder="X" inputmode="numeric" />
+              <input id="coordY" type="number" placeholder="Y" inputmode="numeric" />
+              <input id="coordZ" type="number" placeholder="Z" inputmode="numeric" />
+            </div>
+            <button id="findNearest" class="primary">Nächste Ziele</button>
+            <div id="nearestResults" class="nearest-results"></div>
+          </div>
+
+          <div class="tool-card localization-card">
+            <div class="tool-title"><span>DE</span><div><b>Deutsche Originalnamen</b><small id="localeStatus">Lokalisierung wird geprüft…</small></div></div>
+            <div class="localization-meter"><div id="localeMeterBar"></div></div>
+            <div class="tool-actions">
+              <button id="syncLocale" class="ghost">↻ Originalnamen aktualisieren</button>
+            </div>
+            <p class="tool-note">Die englischen Datenschlüssel bleiben intern erhalten. Angezeigt werden – soweit im Spieldatensatz vorhanden – die offiziellen deutschen TOTK-Namen.</p>
+          </div>
+
+          <div class="tool-card">
+            <div class="tool-title"><span>▦</span><div><b>Datenbank</b><small id="dbStatus">Lade lokale Daten…</small></div></div>
+            <div class="tool-actions">
+              <label class="ghost file-button">⇧ JSON importieren<input id="dataImport" type="file" accept=".json,application/json" hidden></label>
+              <button id="clearImported" class="ghost danger">Import löschen</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="sidebar-footer">
+        <span><i class="status-dot"></i><span id="footerMarkerCount">0 Marker</span></span>
+        <span id="footerLayer">Oberfläche</span>
+      </div>
+    </aside>
+
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="openSidebarBtn" class="icon-button mobile-only" aria-label="Menü öffnen">☰</button>
+          <div>
+            <div class="eyebrow">AKTIVE EBENE</div>
+            <h2 id="activeLayerTitle">Oberfläche</h2>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="addMarkerBtn" class="ghost action-button"><span>＋</span><b>Marker setzen</b></button>
+          <button id="centerBtn" class="ghost action-button"><span>◎</span><b>Einpassen</b></button>
+        </div>
+      </header>
+
+      <section class="map-stage">
+        <div class="map-viewport" id="mapViewport" aria-label="Interaktive TOTK-Karte">
+          <div class="map-world" id="mapWorld">
+            <img id="mapImage" class="map-image" src="assets/maps/surface-medium.png" draggable="false" alt="TOTK-Karte der Oberfläche" />
+            <div id="placeLabelLayer" aria-hidden="false"></div>
+            <div id="markerLayer"></div>
+            <div id="playerPin" class="player-pin hidden"><span>▲</span></div>
+          </div>
+
+          <div class="map-compass">N</div>
+          <div class="map-controls">
+            <button id="zoomInBtn" class="map-control" title="Hineinzoomen">＋</button>
+            <div id="zoomLevel" class="zoom-level">100%</div>
+            <button id="zoomOutBtn" class="map-control" title="Herauszoomen">−</button>
+            <button id="fitMapBtn" class="map-control map-fit" title="Ganze Karte anzeigen">⌂</button>
+          </div>
+          <div class="map-hint"><span class="desktop-hint">Mausrad: Zoom · Ziehen: Verschieben · Doppelklick: Zoom</span><span class="mobile-hint">Zwei Finger/Mausrad: Zoom · Ziehen: Verschieben</span></div>
+        </div>
+
+        <aside class="detail-panel" id="detailPanel">
+          <div class="detail-empty">
+            <div class="detail-icon">⌖</div>
+            <h3>Marker auswählen</h3>
+            <p>Tippe auf einen Marker für Details.</p>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="markerDialog">
+    <form method="dialog" id="markerForm">
+      <div class="dialog-head"><div><span class="eyebrow">EIGENER MARKER</span><h3>Eigener Marker</h3></div><button value="cancel" class="icon-button">×</button></div>
+      <label>Name<input id="customName" required placeholder="z. B. guter Farmspot" /></label>
+      <label>Typ
+        <select id="customType">
+          <option value="custom">Eigener Marker</option>
+          <option value="location">Ort / POI</option>
+          <option value="gleeok">Boss / Griock</option>
+          <option value="cave">Höhle</option>
+        </select>
+      </label>
+      <div class="coord-grid">
+        <label>X<input id="customX" type="number" required /></label>
+        <label>Y<input id="customY" type="number" required /></label>
+        <label>Z<input id="customZ" type="number" required /></label>
+      </div>
+      <label>Notiz<textarea id="customNote" rows="3" placeholder="Optional"></textarea></label>
+      <div class="dialog-actions"><button value="cancel" class="ghost">Abbrechen</button><button id="saveCustom" value="default" class="primary auto-width">Speichern</button></div>
+    </form>
+  </dialog>
+
+  <script src="data/locations.js"></script>
+  <script src="app.js"></script>
+
+<script id="startup-animation-runtime">
+(function(){
+ const boot=document.getElementById('startupBoot');
+ const status=document.getElementById('bootStatus');
+ if(!boot)return;
+ const messages=['Purah-Pad wird synchronisiert','Kartendaten werden geladen','Sensoren werden kalibriert','Hyrule bereit'];
+ [520,1050,1580].forEach((t,i)=>setTimeout(()=>{if(status)status.textContent=messages[i+1]},t));
+ const finish=()=>setTimeout(()=>{boot.classList.add('boot-hide');setTimeout(()=>boot.remove(),750)},2150);
+ if(document.readyState==='complete') finish(); else window.addEventListener('load',finish,{once:true});
+ boot.addEventListener('click',()=>{boot.classList.add('boot-hide');setTimeout(()=>boot.remove(),650)},{once:true});
+})();
+</script>
+
+<script id="pwa-runtime">
+(function(){
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+})();
+</script>
+
+
+
+<script id="deutsche-detailhinweise">
+(function(){
+ const hints={
+  cave:'Höhleneingang',
+  bubbul:'Mayoi in dieser Höhle',
+  chasm:'Abgrund zur Unterwelt',
+  well:'Brunnen',
+  shrine:'Schrein',
+  lightroot:'Wurzel des Lichts',
+  tower:'Kartografierturm',
+  hinox:'Hinox',
+  talus:'Iwarok',
+  molduga:'Moldora',
+  frox:'Gigama',
+  flux_construct:'Blockkonstrukt',
+  gleeok:'Griock',
+  addison:'Birkda-Schild',
+  old_map:'Alte Karte',
+  sages_will:'Wille der Weisen',
+  schema_stone:'Bauplan-Steinplatte',
+  yiga_schematic:'Yiga-Bauplan'
+ };
+ window.TOTK_DE_DETAIL_HINTS=hints;
+})();
+</script>
+</body>
+</html>

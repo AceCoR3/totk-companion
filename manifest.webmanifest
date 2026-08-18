@@ -1,0 +1,30 @@
+{
+  "name": "TOTK Companion",
+  "short_name": "TOTK Companion",
+  "description": "Interaktive Tears of the Kingdom Companion-Karte auf Deutsch",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#081210",
+  "theme_color": "#102a24",
+  "lang": "de-DE",
+  "icons": [
+    {
+      "src": "assets/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/pwa/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
