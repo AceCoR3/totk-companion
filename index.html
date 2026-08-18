@@ -278,6 +278,36 @@ body{
 }
 </style>
 
+
+<style id="hires-map-quality">
+#mapImage,
+.map-image{
+  image-rendering:auto !important;
+  -webkit-font-smoothing:antialiased;
+  transform-origin:0 0;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+</style>
+
+
+<style id="hide-north-indicator">
+.map-compass{
+  display:none !important;
+}
+</style>
+
+
+<style id="disable-custom-markers-ui">
+#addMarkerBtn,
+[data-action="add-marker"],
+.add-marker-btn,
+.custom-marker-add,
+.marker-add-control{
+  display:none !important;
+}
+</style>
+
 </head>
 <body>
 <div id="startupBoot" aria-label="TOTK Companion wird geladen">
@@ -318,7 +348,7 @@ body{
       </label>
 
       <nav class="sidebar-nav" aria-label="Werkzeuge">
-        <button class="sidebar-nav-btn active" data-panel="markersPanel"><span>⌖</span>Marker</button>
+        <button class="sidebar-nav-btn active" data-panel="markersPanel"><span>⌖</span>Karteneinträge</button>
         <button class="sidebar-nav-btn" data-panel="progressPanel"><span>✓</span>Fortschritt</button>
         <button class="sidebar-nav-btn" data-panel="toolsPanel"><span>⚙</span>Werkzeuge</button>
       </nav>
@@ -386,7 +416,7 @@ body{
       </div>
 
       <div class="sidebar-footer">
-        <span><i class="status-dot"></i><span id="footerMarkerCount">0 Marker</span></span>
+        <span><i class="status-dot"></i><span id="footerMarkerCount">0 Karteneinträge</span></span>
         <span id="footerLayer">Oberfläche</span>
       </div>
     </aside>
@@ -535,6 +565,91 @@ body{
     document.addEventListener('DOMContentLoaded', init, {once:true});
   } else {
     init();
+  }
+})();
+</script>
+
+
+<script id="hires-map-runtime">
+(function(){
+  const HIRES_MAPS = {
+    surface: 'assets/maps/surface-medium.png',
+    sky: 'assets/maps/sky-medium.png',
+    depths: 'assets/maps/depths-medium.png'
+  };
+
+  function syncHiResMap(){
+    const img = document.getElementById('mapImage');
+    if(!img) return;
+    let layer = 'surface';
+    try{
+      if(typeof currentLayer !== 'undefined' && currentLayer) layer = currentLayer;
+    }catch(e){}
+    if(typeof window.currentLayer === 'string') layer = window.currentLayer || layer;
+
+    const wanted = HIRES_MAPS[layer] || HIRES_MAPS.surface;
+    if(wanted && !img.getAttribute('src').endsWith(wanted)){
+      img.setAttribute('src', wanted);
+    }
+  }
+
+  function init(){
+    syncHiResMap();
+
+    // Re-sync after UI actions that may change the map layer.
+    document.addEventListener('click', function(e){
+      if(e.target.closest('[data-layer]')) {
+        setTimeout(syncHiResMap, 30);
+        setTimeout(syncHiResMap, 150);
+      }
+    });
+
+    // Observe map image source changes and upgrade medium -> high-res automatically.
+    const img = document.getElementById('mapImage');
+    if(img){
+      new MutationObserver(function(){
+        const src = img.getAttribute('src') || '';
+        const lower = src.toLowerCase();
+        let layer = null;
+        if(lower.includes('surface')) layer='surface';
+        else if(lower.includes('sky')) layer='sky';
+        else if(lower.includes('depth')) layer='depths';
+        if(layer && HIRES_MAPS[layer] && !src.endsWith(HIRES_MAPS[layer])) {
+          img.setAttribute('src', HIRES_MAPS[layer]);
+        }
+      }).observe(img, {attributes:true, attributeFilter:['src']});
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script id="disable-custom-markers-runtime">
+(function(){
+  function disableCustomMarkerUI(){
+    const selectors = [
+      '#addMarkerBtn',
+      '[data-action="add-marker"]',
+      '.add-marker-btn',
+      '.custom-marker-add',
+      '.marker-add-control'
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach(el=>{
+      el.style.display='none';
+      el.setAttribute('aria-hidden','true');
+      el.setAttribute('tabindex','-1');
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',disableCustomMarkerUI,{once:true});
+  }else{
+    disableCustomMarkerUI();
   }
 })();
 </script>

@@ -1,3 +1,7 @@
+# TOTK Companion v1.0.8.1 Hi-Res
+
+Nur Kartenqualität geändert: Die App nutzt jetzt für Oberfläche, Himmel und Unterwelt jeweils das im Paket vorhandene Kartenbild mit der höchsten Auflösung. Layout, Marker, Filter, Mobile-UI und Bedienung bleiben unverändert.
+
 # TOTK Companion v1.0.8.1 iOS Fix
 
 iPhone/PWA-Fix: Safe-Area-Unterstützung für Notch, Dynamic Island und Home-Indikator, `viewport-fit=cover`, `100dvh` statt altem `100vh`, zusätzliche Mobile-Abstände und kompaktere Toolbar. Dadurch liegen Buttons nicht mehr direkt am Displayrand und die Karte nutzt die tatsächlich verfügbare Bildschirmhöhe.
