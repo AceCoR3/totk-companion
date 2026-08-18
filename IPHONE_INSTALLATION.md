@@ -1,3 +1,7 @@
+# iPhone / PWA
+
+Die App besitzt jetzt ein eigenes Triforce-inspiriertes Homescreen-Icon, iOS-Startup-Screens für mehrere aktuelle iPhone-Größen, Standalone-Modus, Safe-Area-Unterstützung und eine angepasste dunkle Statusleiste.
+
 # iPhone-Installation
 
 Damit der TOTK Companion wie eine App auf dem iPhone-Homescreen läuft, muss er über eine HTTPS-Adresse geöffnet werden.
