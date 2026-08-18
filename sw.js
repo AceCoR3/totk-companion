@@ -1,4 +1,4 @@
-const CACHE_NAME = 'totk-companion-v1081-ios';
+const CACHE_NAME = 'totk-companion-v1081-clean-safe';
 const APP_FILES = [
   "./LOKALISIERUNG.md",
   "./README.md",

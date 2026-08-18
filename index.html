@@ -246,6 +246,38 @@ body{
 }
 </style>
 
+
+<style id="clean-ui-safe-only">
+/* Hide only the empty marker prompt, without touching detail rendering itself. */
+.detail-empty{
+  display:none !important;
+}
+.detail-panel:has(.detail-empty){
+  display:none !important;
+}
+
+/* Hide visible zoom controls and zoom status only. */
+.map-controls,
+#zoomInBtn,
+#zoomOutBtn,
+#zoomLevel,
+#fitMapBtn{
+  display:none !important;
+}
+
+/* Hide the top 'Einpassen/Zentrieren' control only. */
+#centerBtn{
+  display:none !important;
+}
+
+/* Hide the zoom/drag instruction line only. */
+.map-hint,
+.desktop-hint,
+.mobile-hint{
+  display:none !important;
+}
+</style>
+
 </head>
 <body>
 <div id="startupBoot" aria-label="TOTK Companion wird geladen">
@@ -481,5 +513,31 @@ body{
  window.TOTK_DE_DETAIL_HINTS=hints;
 })();
 </script>
+
+<script id="clean-ui-safe-runtime">
+(function(){
+  function updateEmptyDetail(){
+    const panel = document.getElementById('detailPanel');
+    if(!panel) return;
+    const empty = panel.querySelector('.detail-empty');
+    panel.style.display = empty ? 'none' : '';
+  }
+
+  function init(){
+    const panel = document.getElementById('detailPanel');
+    if(panel){
+      updateEmptyDetail();
+      new MutationObserver(updateEmptyDetail).observe(panel, {childList:true, subtree:true});
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  } else {
+    init();
+  }
+})();
+</script>
+
 </body>
 </html>
