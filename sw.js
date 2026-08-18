@@ -1,4 +1,4 @@
-const CACHE_NAME = 'totk-companion-v1086-no-fade-toggle';
+const CACHE_NAME = 'totk-companion-v1090-interaction';
 const APP_FILES = [
   "./LOKALISIERUNG.md",
   "./README.md",

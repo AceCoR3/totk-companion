@@ -199,6 +199,19 @@ function panToCoordinate(x,y,targetZoom=Math.max(2.2,view.zoom)){
 mapViewport.addEventListener('wheel',e=>{e.preventDefault();setZoom(view.zoom*(e.deltaY<0?1.18:1/1.18),e.clientX,e.clientY)},{passive:false});
 mapViewport.addEventListener('dblclick',e=>{if(!e.target.closest('.marker'))setZoom(view.zoom*1.65,e.clientX,e.clientY)});
 const activePointers=new Map();let pinchState=null;
+
+let lastMapTapTime=0,lastMapTapX=0,lastMapTapY=0;
+function closeSelectedMarker(){
+  if(selectedId!==null){
+    selectedId=null;
+    render();
+  }
+}
+function zoomAtClientPoint(clientX,clientY,factor=1.7){
+  const rect=mapViewport.getBoundingClientRect();
+  const cx=clientX-rect.left,cy=clientY-rect.top;
+  setZoom(Math.min(MAX_ZOOM,view.zoom*factor),cx,cy);
+}
 mapViewport.addEventListener('pointerdown',e=>{
   if(e.button!==0||e.target.closest('.marker,.map-controls'))return;
   activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -210,16 +223,27 @@ mapViewport.addEventListener('pointerdown',e=>{
     pinchState={distance:Math.hypot(dx,dy),zoom:view.zoom,cx:(pts[0].x+pts[1].x)/2,cy:(pts[0].y+pts[1].y)/2};
   }
 });
+let pointerRaf=0,lastPointerEvent=null;
 mapViewport.addEventListener('pointermove',e=>{
   if(!activePointers.has(e.pointerId))return;
   activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(activePointers.size>=2){
-    const pts=[...activePointers.values()].slice(0,2),dx=pts[1].x-pts[0].x,dy=pts[1].y-pts[0].y,dist=Math.hypot(dx,dy);
-    if(!pinchState||!pinchState.distance)return;
-    const cx=(pts[0].x+pts[1].x)/2,cy=(pts[0].y+pts[1].y)/2;
-    setZoom(pinchState.zoom*(dist/pinchState.distance),cx,cy);return;
-  }
-  if(!view.dragging)return;view.x=view.startViewX+(e.clientX-view.startX);view.y=view.startViewY+(e.clientY-view.startY);applyView();
+  lastPointerEvent=e;
+  if(pointerRaf)return;
+  pointerRaf=requestAnimationFrame(()=>{
+    pointerRaf=0;
+    const ev=lastPointerEvent;
+    if(!ev)return;
+    if(activePointers.size>=2){
+      const pts=[...activePointers.values()].slice(0,2),dx=pts[1].x-pts[0].x,dy=pts[1].y-pts[0].y,dist=Math.hypot(dx,dy);
+      if(!pinchState||!pinchState.distance)return;
+      const cx=(pts[0].x+pts[1].x)/2,cy=(pts[0].y+pts[1].y)/2;
+      setZoom(pinchState.zoom*(dist/pinchState.distance),cx,cy);return;
+    }
+    if(!view.dragging)return;
+    view.x=view.startViewX+(ev.clientX-view.startX);
+    view.y=view.startViewY+(ev.clientY-view.startY);
+    applyView();
+  });
 });
 function endDrag(e){
   activePointers.delete(e.pointerId);try{mapViewport.releasePointerCapture(e.pointerId)}catch{}
@@ -228,17 +252,46 @@ function endDrag(e){
   view.dragging=false;mapViewport.classList.remove('dragging');
 }
 mapViewport.addEventListener('pointerup',endDrag);mapViewport.addEventListener('pointercancel',endDrag);
+
+mapViewport.addEventListener('dblclick',e=>{
+  if(e.target.closest('.marker,.marker-cluster,.place-label,.detail-panel,.quick-map-layers'))return;
+  e.preventDefault();
+  zoomAtClientPoint(e.clientX,e.clientY,1.75);
+});
+
+mapViewport.addEventListener('click',e=>{
+  if(e.target.closest('.marker,.marker-cluster,.place-label,.detail-panel,.quick-map-layers'))return;
+  closeSelectedMarker();
+});
+
+mapViewport.addEventListener('pointerup',e=>{
+  if(e.pointerType!=='touch')return;
+  if(e.target.closest('.marker,.marker-cluster,.place-label,.detail-panel,.quick-map-layers'))return;
+  const now=performance.now();
+  const dx=e.clientX-lastMapTapX,dy=e.clientY-lastMapTapY;
+  const near=Math.hypot(dx,dy)<32;
+  if(now-lastMapTapTime<320 && near){
+    e.preventDefault();
+    lastMapTapTime=0;
+    zoomAtClientPoint(e.clientX,e.clientY,1.75);
+  }else{
+    lastMapTapTime=now;
+    lastMapTapX=e.clientX;
+    lastMapTapY=e.clientY;
+  }
+});
+
 $('zoomInBtn').onclick=()=>setZoom(view.zoom*1.35);$('zoomOutBtn').onclick=()=>setZoom(view.zoom/1.35);$('fitMapBtn').onclick=fitMap;
 
 function updateDb(){
-  const markers=allMarkers(),layers=markers.reduce((a,m)=>(a[m.layer]=(a[m.layer]||0)+1,a),{});
+  const markers=fastAllMarkers(),layers=markers.reduce((a,m)=>(a[m.layer]=(a[m.layer]||0)+1,a),{});
   $('dbStatus').textContent=`${markers.length.toLocaleString('de-DE')} Marker · ${(layers.surface||0).toLocaleString('de-DE')} Oberfläche · ${(layers.sky||0).toLocaleString('de-DE')} Himmel · ${(layers.depths||0).toLocaleString('de-DE')} Untergrund`;
   $('footerMarkerCount').textContent=`${markers.length.toLocaleString('de-DE')} Marker`;
   $('footerLayer').textContent=layerTitles[currentLayer];
 }
 function layerTypeCounts(layer=currentLayer){
   const counts=new Map();
-  allMarkers().forEach(m=>{if(m.layer===layer)counts.set(m.type,(counts.get(m.type)||0)+1)});
+  fastAllMarkers().forEach(m=>{if(m.layer===layer)counts.set(m.type,(counts.get(m.type)||0)+1)});
   return counts;
 }
 const listIconMap={"shrine":"shrine.png","lightroot":"lightroot.png","korok":"korok_hidden_start.png","cave":"cave.png","bubbul":"bubbul.png","well":"well.png","chasm":"chasm.png","hinox":"hinox.png","talus":"talus.png","molduga":"molduga.png","flux_construct":"flux_construct.png","frox":"frox.png","gleeok":"gleeok.png","old_map":"old_map.png","sages_will":"sages_will.png","addison":"addison_sign.png","yiga_schematic":"yiga_schematic.png","schema_stone":"schema_stone.png","location":"location.png"};
@@ -263,7 +316,10 @@ function renderFilters(){
   const visibleTypes=[...filters.querySelectorAll('input')];
   $('toggleAllFilters').textContent=visibleTypes.length&&visibleTypes.every(i=>i.checked)?'Alle aus':'Alle an';
 }
-function visible(){const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();return allMarkers().filter(m=>m.layer===currentLayer&&active.has(m.type)&&(!q||`${markerName(m)} ${m.name} ${m.name_en||''} ${m.type} ${m.note||''}`.toLowerCase().includes(q)))}
+let _allMarkersCache=null;
+function fastAllMarkers(){return _allMarkersCache||(_allMarkersCache=allMarkers())}
+function invalidateMarkerCache(){_allMarkersCache=null}
+function visible(){const q=searchInput.value.trim().toLowerCase(),active=enabledTypes();return fastAllMarkers().filter(m=>m.layer===currentLayer&&active.has(m.type)&&(!q||`${markerName(m)} ${m.name} ${m.name_en||''} ${m.type} ${m.note||''}`.toLowerCase().includes(q)))}
 
 let placeLabelRAF=0;
 function schedulePlaceLabels(){
@@ -372,7 +428,7 @@ function appendMarker(m){
   b.onclick=e=>{e.stopPropagation();selectedId=m.id;render();};markerLayer.appendChild(b);
 }
 function renderDetail(){
-  const m=allMarkers().find(x=>x.id===selectedId);
+  const m=fastAllMarkers().find(x=>x.id===selectedId);
   if(!m||m.layer!==currentLayer){detailPanel.innerHTML='<div class="detail-empty"><div class="detail-icon">⌖</div><h3>Marker auswählen</h3><p>Tippe auf einen Marker für Details.</p></div>';return}
   const info=typeInfo[m.type]||typeInfo.custom;
   const done=completed.has(m.id);
@@ -392,28 +448,84 @@ function renderDetail(){
   </div>`;
   $('focusMarkerBtn').onclick=()=>panToCoordinate(m.x,m.y,Math.max(3,view.zoom));
   $('detailCloseBtn').onclick=()=>{selectedId=null;render()};
-  $('completeBtn').onclick=()=>{completed.has(m.id)?completed.delete(m.id):completed.add(m.id);localStorage.setItem('totk.completed',JSON.stringify([...completed]));render()};
+  $('completeBtn').onclick=()=>{completed.has(m.id)?completed.delete(m.id):completed.add(m.id);localStorage.setItem('totk.completed',JSON.stringify([...completed]));markStatsDirty();render()};
 }
+const progressIconMap={"shrine":"shrine.png","tower":null,"lightroot":"lightroot.png","korok":"korok_hidden_start.png","cave":"cave.png","bubbul":"bubbul.png","well":"well.png","chasm":"chasm.png","hinox":"hinox.png","talus":"talus.png","molduga":"molduga.png","flux_construct":"flux_construct.png","frox":"frox.png","gleeok":"gleeok.png","old_map":"old_map.png","sages_will":"sages_will.png","addison":"addison_sign.png","schema_stone":"schema_stone.png","yiga_schematic":"yiga_schematic.png"};
 function renderProgress(){
   const w=$('progressList');w.innerHTML='';
   const tracked=['shrine','tower','lightroot','korok','cave','bubbul','well','chasm','hinox','talus','molduga','flux_construct','frox','gleeok','old_map','sages_will','addison','schema_stone','yiga_schematic'];
   let total=0,done=0;
-  tracked.forEach(t=>{const a=allMarkers().filter(m=>m.type===t);if(!a.length)return;const d=a.filter(m=>completed.has(m.id)).length,pct=Math.round(d/a.length*100);total+=a.length;done+=d;const info=typeInfo[t];w.insertAdjacentHTML('beforeend',`<div class="progress-row"><div class="progress-meta"><span class="mini-icon" style="--marker-color:${info.color}">${info.icon}</span><span>${info.label}</span></div><span class="progress-count">${d}/${a.length}</span><div class="bar"><div style="width:${pct}%"></div></div></div>`) });
+
+  tracked.forEach(t=>{
+    const a=fastAllMarkers().filter(m=>m.type===t);
+    if(!a.length)return;
+
+    const d=a.filter(m=>completed.has(m.id)).length;
+    const pct=Math.round(d/a.length*100);
+    total+=a.length;done+=d;
+
+    const info=typeInfo[t];
+    const icon=progressIconMap[t]
+      ? `<img src="assets/icons/${progressIconMap[t]}" alt="">`
+      : `<span class="progress-fallback-icon" style="color:${info.color}">${info.icon}</span>`;
+
+    w.insertAdjacentHTML('beforeend',`
+      <div class="progress-item">
+        <div class="progress-item-main">
+          <div class="progress-item-icon">${icon}</div>
+          <div class="progress-item-copy">
+            <div class="progress-item-head">
+              <b>${info.label}</b>
+              <span>${d.toLocaleString('de-DE')} / ${a.length.toLocaleString('de-DE')}</span>
+            </div>
+            <div class="progress-item-bar"><i style="width:${pct}%"></i></div>
+          </div>
+          <strong>${pct}%</strong>
+        </div>
+      </div>
+    `);
+  });
+
   const pct=total?Math.round(done/total*100):0;
-  $('progressSummary').innerHTML=`<div class="progress-ring" style="--p:${pct}"><b>${pct}%</b></div><div class="progress-summary-copy"><b>${done.toLocaleString('de-DE')} erledigt</b><small>von ${total.toLocaleString('de-DE')} trackbaren Markern</small></div>`;
+  $('progressSummary').innerHTML=`
+    <div class="progress-overview">
+      <div class="progress-summary-copy">
+        <b>${done.toLocaleString('de-DE')} erledigt</b>
+        <small>von ${total.toLocaleString('de-DE')} trackbaren Markern</small>
+        <strong class="progress-summary-percent">${pct}%</strong>
+        <div class="progress-summary-bar"><i style="width:${pct}%"></i></div>
+      </div>
+    </div>
+  `;
 }
 function updateLayerImage(){mapImage.src=mapSources[currentLayer];mapImage.alt=`TOTK ${layerTitles[currentLayer]} Karte`}
-function render(){ $('activeLayerTitle').textContent=layerTitles[currentLayer];document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.layer===currentLayer));renderMarkers();renderPlaceLabels();renderDetail();renderProgress();updateDb()}
+let _progressDirty=true,_dbDirty=true;
+function markStatsDirty(){_progressDirty=true;_dbDirty=true}
+function render(){
+  $('activeLayerTitle').textContent=layerTitles[currentLayer];
+  function preloadLayerMaps(){
+  Object.values(mapSources).forEach(src=>{const img=new Image();img.decoding='async';img.src=src});
+}
+if('requestIdleCallback' in window)requestIdleCallback(preloadLayerMaps,{timeout:1800});
+else setTimeout(preloadLayerMaps,700);
+document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.layer===currentLayer));
+  renderMarkers();
+  renderPlaceLabels();
+  renderDetail();
+  if(_progressDirty){renderProgress();_progressDirty=false}
+  if(_dbDirty){updateDb();_dbDirty=false}
+}
 
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{currentLayer=t.dataset.layer;selectedId=null;updateLayerImage();fitMap();renderFilters();render()});
 document.querySelectorAll('.sidebar-nav-btn').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.sidebar-nav-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.side-panel').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.panel));});
 $('toggleAllFilters').onclick=()=>{const rendered=[...filters.querySelectorAll('input')],allOn=rendered.length&&rendered.every(i=>i.checked),set=enabledTypes();rendered.forEach(i=>{allOn?set.delete(i.dataset.type):set.add(i.dataset.type)});saveFilterState();renderFilters();render();};
 const setSidebar=open=>document.body.classList.toggle('sidebar-open',open);
 $('openSidebarBtn').onclick=()=>setSidebar(true);$('closeSidebarBtn').onclick=()=>setSidebar(false);$('sidebarBackdrop').onclick=()=>setSidebar(false);
-searchInput.oninput=render;hideCompleted.onchange=render;showPlaceLabels.onchange=()=>{localStorage.setItem(PLACE_LABEL_KEY,JSON.stringify(showPlaceLabels.checked));renderPlaceLabels()};
-$('resetProgress').onclick=()=>{if(confirm('Fortschritt zurücksetzen?')){completed.clear();localStorage.removeItem('totk.completed');render()}};
-$('dataImport').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());importedMarkers=flatten(data).map(normalizeOne).filter(m=>Number.isFinite(m.x)&&Number.isFinite(m.y)&&Number.isFinite(m.z));localStorage.setItem('totk.importedMarkers',JSON.stringify(importedMarkers));selectedId=null;renderFilters();render();alert(`${importedMarkers.length} Marker importiert.`)}catch(err){alert('JSON konnte nicht importiert werden: '+err.message)}};
-$('clearImported').onclick=()=>{importedMarkers=[];localStorage.removeItem('totk.importedMarkers');renderFilters();render()};
+let searchRenderTimer=0;
+searchInput.oninput=()=>{clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(render,90)};hideCompleted.onchange=render;showPlaceLabels.onchange=()=>{localStorage.setItem(PLACE_LABEL_KEY,JSON.stringify(showPlaceLabels.checked));renderPlaceLabels()};
+$('resetProgress').onclick=()=>{if(confirm('Fortschritt zurücksetzen?')){completed.clear();localStorage.removeItem('totk.completed');markStatsDirty();render()}};
+$('dataImport').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());importedMarkers=flatten(data).map(normalizeOne).filter(m=>Number.isFinite(m.x)&&Number.isFinite(m.y)&&Number.isFinite(m.z));localStorage.setItem('totk.importedMarkers',JSON.stringify(importedMarkers));invalidateMarkerCache();markStatsDirty();selectedId=null;renderFilters();render();alert(`${importedMarkers.length} Marker importiert.`)}catch(err){alert('JSON konnte nicht importiert werden: '+err.message)}};
+$('clearImported').onclick=()=>{importedMarkers=[];localStorage.removeItem('totk.importedMarkers');invalidateMarkerCache();markStatsDirty();renderFilters();render()};
 $('findNearest').onclick=()=>{const x=Number($('coordX').value),y=Number($('coordY').value),z=Number($('coordZ').value);if([x,y,z].some(Number.isNaN))return;const pin=coordToPct(x,y),pl=$('playerPin');pl.style.left=pin.left+'%';pl.style.top=pin.top+'%';pl.classList.remove('hidden');panToCoordinate(x,y,Math.max(2.5,view.zoom));const n=allMarkers().filter(m=>m.layer===currentLayer&&!completed.has(m.id)&&enabledTypes().has(m.type)).map(m=>({...m,d:Math.hypot(m.x-x,m.y-y,m.z-z)})).sort((a,b)=>a.d-b.d).slice(0,5);$('nearestResults').innerHTML=n.map(m=>`<div class="nearest-item"><b>${esc(markerName(m))}</b><br>${typeInfo[m.type]?.label||m.type} · ${Math.round(m.d)} Einheiten</div>`).join('')};
 $('centerBtn').onclick=()=>fitMap();
 const dlg=$('markerDialog');$('addMarkerBtn').onclick=()=>dlg.showModal();$('saveCustom').onclick=e=>{e.preventDefault();const name=$('customName').value.trim(),x=Number($('customX').value),y=Number($('customY').value),z=Number($('customZ').value);if(!name||[x,y,z].some(Number.isNaN))return;const m={id:'u'+Date.now(),name,type:$('customType').value,layer:currentLayer,x,y,z,note:$('customNote').value.trim(),custom:true};customMarkers.push(m);localStorage.setItem('totk.customMarkers',JSON.stringify(customMarkers));selectedId=m.id;$('markerForm').reset();dlg.close();renderFilters();render();panToCoordinate(x,y,3)};
