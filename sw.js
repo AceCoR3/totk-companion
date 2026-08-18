@@ -1,4 +1,4 @@
-const CACHE_NAME = 'totk-companion-v1081-tower-fix';
+const CACHE_NAME = 'totk-companion-v1081-header-fix';
 const APP_FILES = [
   "./LOKALISIERUNG.md",
   "./README.md",

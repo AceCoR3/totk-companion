@@ -327,7 +327,7 @@ body{
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-head">
         <div class="brand">
-          <div class="brand-mark">◈</div>
+          <div class="brand-mark"><svg class="totk-triforce" viewBox="0 0 100 88" aria-hidden="true"><polygon points="50,2 26,44 74,44" fill="currentColor"/><polygon points="26,44 2,86 50,86" fill="currentColor"/><polygon points="74,44 50,86 98,86" fill="currentColor"/></svg></div>
           <div class="brand-copy">
             <h1>TOTK Companion</h1>
             <p>Hyrule-Begleiter · v1.0 DE</p>
@@ -336,11 +336,7 @@ body{
         <button id="closeSidebarBtn" class="icon-button mobile-only" aria-label="Menü schließen">×</button>
       </div>
 
-      <div class="layer-tabs" id="layerTabs">
-        <button class="tab active" data-layer="surface"><img class="layer-romfs-icon" src="assets/icons/surface.png" alt=""><span>Oberfläche</span></button>
-        <button class="tab" data-layer="sky"><img class="layer-romfs-icon" src="assets/icons/sky.png" alt=""><span>Himmel</span></button>
-        <button class="tab" data-layer="depths"><img class="layer-romfs-icon" src="assets/icons/depths.png" alt=""><span>Unterwelt</span></button>
-      </div>
+      
 
       <label class="search-box">
         <span class="search-icon">⌕</span>
@@ -439,7 +435,12 @@ body{
       </header>
 
       <section class="map-stage">
-        <div class="map-viewport" id="mapViewport" aria-label="Interaktive TOTK-Karte">
+        <div class="layer-tabs quick-map-layers" id="layerTabs">
+        <button class="tab active" data-layer="surface"><img class="layer-romfs-icon" src="assets/icons/surface.png" alt=""><span>Oberfläche</span></button>
+        <button class="tab" data-layer="sky"><img class="layer-romfs-icon" src="assets/icons/sky.png" alt=""><span>Himmel</span></button>
+        <button class="tab" data-layer="depths"><img class="layer-romfs-icon" src="assets/icons/depths.png" alt=""><span>Unterwelt</span></button>
+      </div>
+<div class="map-viewport" id="mapViewport" aria-label="Interaktive TOTK-Karte">
           <div class="map-world" id="mapWorld">
             <img id="mapImage" class="map-image" src="assets/maps/surface-medium.png" draggable="false" alt="TOTK-Karte der Oberfläche" />
             <div id="placeLabelLayer" aria-hidden="false"></div>
@@ -650,6 +651,56 @@ body{
     document.addEventListener('DOMContentLoaded',disableCustomMarkerUI,{once:true});
   }else{
     disableCustomMarkerUI();
+  }
+})();
+</script>
+
+
+<script id="quick-layer-mobile-menu-visibility">
+(function(){
+  function menuIsOpen(){
+    const sidebar = document.getElementById('sidebar');
+    if(!sidebar) return false;
+
+    const cs = getComputedStyle(sidebar);
+    const rect = sidebar.getBoundingClientRect();
+
+    if(window.innerWidth > 720) return false;
+
+    /* Mobile sidebar is considered open when it is visibly occupying the viewport. */
+    return cs.display !== 'none'
+      && cs.visibility !== 'hidden'
+      && rect.width > 100
+      && rect.right > 20
+      && rect.left < window.innerWidth;
+  }
+
+  function sync(){
+    document.body.classList.toggle('mobile-menu-open', menuIsOpen());
+  }
+
+  function init(){
+    const sidebar = document.getElementById('sidebar');
+    if(sidebar){
+      new MutationObserver(sync).observe(sidebar,{
+        attributes:true,
+        attributeFilter:['class','style']
+      });
+    }
+
+    document.addEventListener('click', function(){
+      setTimeout(sync, 20);
+      setTimeout(sync, 180);
+    });
+
+    window.addEventListener('resize', sync);
+    sync();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init, {once:true});
+  }else{
+    init();
   }
 })();
 </script>

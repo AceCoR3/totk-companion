@@ -83,3 +83,89 @@ dialog{width:min(480px,92vw);max-height:88dvh;overflow:auto;border:1px solid var
   display:grid;
   place-items:center;
 }
+
+/* Quick layer switch: original functional layer buttons, visually moved onto the map. */
+.main{ position:relative; }
+
+.quick-map-layers{
+  position:absolute !important;
+  z-index:60 !important;
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:max(18px, calc(12px + env(safe-area-inset-bottom, 0px))) !important;
+  transform:translateX(-50%) !important;
+  width:auto !important;
+  max-width:calc(100% - 28px) !important;
+  margin:0 !important;
+  padding:5px !important;
+  display:flex !important;
+  flex-direction:row !important;
+  gap:5px !important;
+  border-radius:14px !important;
+  background:rgba(7,18,15,.90) !important;
+  backdrop-filter:blur(10px) !important;
+  box-shadow:0 8px 26px rgba(0,0,0,.38) !important;
+}
+
+/* Prevent generic sidebar/grid styles from stretching the moved buttons. */
+.quick-map-layers > *{
+  flex:0 0 auto !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:44px !important;
+  min-height:44px !important;
+  max-height:44px !important;
+  margin:0 !important;
+}
+
+@media(max-width:720px){
+  .quick-map-layers{
+    bottom:max(14px, calc(10px + env(safe-area-inset-bottom, 0px))) !important;
+  }
+  .quick-map-layers > *{
+    height:46px !important;
+    min-height:46px !important;
+    max-height:46px !important;
+  }
+}
+
+/* Quick layer switch: top-center placement to avoid mobile detail-panel overlap. */
+.quick-map-layers{
+  top:max(72px, calc(62px + env(safe-area-inset-top, 0px))) !important;
+  bottom:auto !important;
+}
+
+@media(max-width:720px){
+  .quick-map-layers{
+    top:max(70px, calc(60px + env(safe-area-inset-top, 0px))) !important;
+    bottom:auto !important;
+  }
+}
+
+/* Mobile: layer switch belongs to the map, so hide it while the sidebar is open. */
+@media(max-width:720px){
+  body.mobile-menu-open .quick-map-layers{
+    display:none !important;
+  }
+}
+
+/* Header polish */
+.totk-triforce{
+  display:block;
+  width:20px;
+  height:18px;
+  color:#d9fff2;
+  filter:drop-shadow(0 0 4px rgba(100,255,210,.28));
+}
+
+/* Desktop has a permanently visible sidebar, so the menu toggle is redundant. */
+@media(min-width:721px){
+  #menuBtn,
+  #sidebarToggle,
+  .menu-btn,
+  .sidebar-toggle,
+  .hamburger-btn{
+    display:none !important;
+  }
+}
